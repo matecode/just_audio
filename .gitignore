@@ -15,3 +15,5 @@ build/
 .flutter-plugins
 coverage
 pubspec.lock
+just_audio_background/example/.fvm/flutter_sdk
+just_audio_background/example/.fvm/fvm_config.json
