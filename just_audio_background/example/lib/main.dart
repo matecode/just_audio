@@ -26,22 +26,9 @@ class MyAppState extends State<MyApp> {
   static int _nextMediaId = 0;
   late AudioPlayer _player;
   final _playlist = ConcatenatingAudioSource(children: [
-    ClippingAudioSource(
-      start: const Duration(seconds: 60),
-      end: const Duration(seconds: 90),
-      child: AudioSource.uri(Uri.parse(
-          "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")),
-      tag: MediaItem(
-        id: '${_nextMediaId++}',
-        album: "Science Friday",
-        title: "A Salute To Head-Scratching Science (30 seconds)",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
-      ),
-    ),
     AudioSource.uri(
       Uri.parse(
-          "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3"),
+          "https://s4.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3"),
       tag: MediaItem(
         id: '${_nextMediaId++}',
         album: "Science Friday",
@@ -50,22 +37,12 @@ class MyAppState extends State<MyApp> {
             "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
       ),
     ),
-    AudioSource.uri(
-      Uri.parse("https://s3.amazonaws.com/scifri-segments/scifri201711241.mp3"),
+    LockCachingAudioSource(
+      Uri.parse("https://s4.amazonaws.com/scifri-segments/scifri201711241.mp3"),
       tag: MediaItem(
         id: '${_nextMediaId++}',
         album: "Science Friday",
         title: "From Cat Rheology To Operatic Incompetence",
-        artUri: Uri.parse(
-            "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
-      ),
-    ),
-    AudioSource.uri(
-      Uri.parse("asset:///audio/nature.mp3"),
-      tag: MediaItem(
-        id: '${_nextMediaId++}',
-        album: "Public Domain",
-        title: "Nature Sounds",
         artUri: Uri.parse(
             "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg"),
       ),
@@ -339,7 +316,15 @@ class ControlButtons extends StatelessWidget {
               return IconButton(
                 icon: const Icon(Icons.play_arrow),
                 iconSize: 64.0,
-                onPressed: player.play,
+                onPressed: () {
+                  try {
+                    player.play();
+                  } catch (e, stackTrace) {
+                    // Catch load errors: 404, invalid url ...
+                    print("Error playing: $e");
+                    print(stackTrace);
+                  }
+                },
               );
             } else if (processingState != ProcessingState.completed) {
               return IconButton(
